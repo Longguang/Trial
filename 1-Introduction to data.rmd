@@ -1,0 +1,71 @@
+---
+title: "Introduction to data"
+output: html_document
+---
+## 1. 数据获取
+```{r, highlight=TRUE, message=FALSE}
+load(url("http://assets.datacamp.com/course/dasi/cdc.Rdata"))
+names(cdc)
+head(cdc)
+tail(cdc)
+str(cdc)
+head(cdc$height)
+tail(cdc$height)
+head(cdc$genhlth)
+tail(cdc$genhlth)
+sum <- 84941+19686
+mult <- 73*51
+mean(cdc$weight)
+var(cdc$weight)
+median(cdc$weight)
+summary(cdc$weight)
+```
+
+## 2. table
+```{r, highlight=TRUE, message=FALSE}
+dim(cdc)
+table(cdc$smoke100)
+table(cdc$smoke100)/length(cdc$smoke100)
+barplot(table(cdc$smoke100))#显示table的柱状图
+table(cdc$gender)
+table(cdc$genhlth)/nrow(cdc)
+table(cdc$genhlth, cdc$smoke100)
+gender_smokers <- table(cdc$gender, cdc$smoke100)
+mosaicplot(gender_smokers)#对应table的二维度直方图
+```
+## 3. 数据提取
+```{r, highlight=TRUE, message=FALSE}
+height_1337 <- cdc[1337, "cdc$height"]
+weight_111 <- cdc[111, "cdc$weight"]
+weight_111 <- cdc[111, "weight"]
+height_1337 <- cdc[1337, "height"]
+height_1337
+weight_111
+cdc[1, "height"]
+first8 <- cdc[1:8, 3:5]
+wt_gen_10_20 <- cdc[10:20, 6:9]
+resp205 <- cdc[205, ]
+ht_wt <- cdc[, 5:6]
+resp1000_smk <- cdc$smoke100[1000]
+first30_ht <- cdc$height[1:30]
+```
+### 3.1 subset
+```{r, highlight=TRUE, message=FALSE}
+very_good <- subset(cdc, genhlth == "very good")
+age_gt50 <- subset(cdc, cdc$age > 50)
+under23_and_smoke <- subset(cdc, age < 23 & smoke100 == 1)
+str(under23_and_smoke)
+```
+### 3.2 boxplot, histgram & scatterplot
+```{r, highlight=TRUE, message=FALSE}
+boxplot(cdc$height)
+summary(cdc$height)
+boxplot(cdc$height ~ cdc$gender)
+boxplot(cdc$weight ~ cdc$smoke100)
+bmi <- cdc$weight/cdc$height^2*703
+boxplot(bmi ~ cdc$genhlth)
+hist(bmi)
+hist(bmi, breaks = 50)
+hist(bmi, breaks = 100)
+plot(cdc$weight, cdc$wtdesire)
+```

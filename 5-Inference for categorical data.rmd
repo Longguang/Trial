@@ -1,0 +1,42 @@
+---
+title: "Inference for categorical data"
+output: html_document
+---
+## 1. Check data
+```{r, highlight=TRUE, message=FALSE}
+load(url("http://assets.datacamp.com/course/dasi/atheism.RData"))
+names(atheism)
+str(atheism)
+```
+
+##2. Proportion
+> subset()
+
+**For 2012**
+```{r, highlight=TRUE, message=FALSE}
+load(url("http://assets.datacamp.com/course/dasi/inference.Rdata"))
+us12 <- subset(atheism, atheism$nationality == "United States" & atheism$year =="2012")
+table(us12$response)/length(us12$response)
+proportion <- nrow(subset(us12,response == 'atheist'))/nrow(us12)
+proportion
+inference(us12$response, est = "proportion", type = "ci", method = "theoretical", success = "atheist")
+```
+
+**For 2005~2012**
+```{r, highlight=TRUE, message=FALSE}
+us <- subset(atheism, atheism$nationality == "United States")
+proportion <- nrow(subset(us,response == 'atheist'))/nrow(us)
+inference(us$response, us$year, est = "proportion", type = "ci", method = "theoretical", success = "atheist")
+```
+
+
+##3. The margin of error
+> margin of error = ci/2
+
+```{r, highlight=TRUE, message=FALSE}
+n <- 1000
+p <- seq(0, 1, 0.01)
+me <- 2 * sqrt(p * (1 - p)/n)
+plot(me ~ p)
+```
+

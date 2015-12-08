@@ -1,0 +1,75 @@
+---
+title: "Inference for numerical data"
+output: html_document
+---
+##1. Check data
+```{r, highlight=TRUE, message=FALSE}
+load(url("http://assets.datacamp.com/course/dasi/nc.Rdata"))
+names(nc)
+summary(nc)
+summary(nc$gained)
+hist(nc$gained)
+```
+
+##2. Bootstrape
+
+> na.omit()
+
+```{r, highlight=TRUE, message=FALSE}
+gained_clean <- na.omit(nc$gained)
+n <- length(gained_clean)
+load(url("http://assets.datacamp.com/course/dasi/inference.Rdata"))
+boot_means <- rep(NA, 100)
+for(i in 1:100){
+        samp <- sample(gained_clean, n, replace = TRUE)
+        boot_means[i] <- mean(samp)
+}
+hist(boot_means)
+inference(nc$gained, type="ci", method="simulation", conflevel=0.9, est="mean", boot_method="perc")# conflevel=0.9,boot_method="perc"
+inference(nc$gained, type="ci", method="simulation", conflevel=0.95, est="mean", boot_method="perc")# conflevel=0.95,boot_method="perc"
+inference(nc$gained, type="ci", method="simulation", conflevel=0.95, est="mean", boot_method="se")# conflevel=0.95,boot_method="se"
+```
+##3. Plotting for categorical data
+> by(), 
+
+```{r, highlight=TRUE, message=FALSE}
+by(nc$mage, nc$mature, summary)
+by(nc$weight, nc$habit, length)
+class(by(nc$weight, nc$habit, length))
+plot(nc$weight ~ nc$habit)
+```
+
+##4. Inference function for comparison
+```{r, highlight=TRUE, message=FALSE}
+inference(y = nc$weight, x = nc$habit, est = "mean", type = "ht", null = 0, alternative = "twosided", method = "theoretical")
+#The third argument, est, is the parameter we’re interested in: "mean" (other options are "median", or "proportion".)
+#Next we decide on the type of inference we want: a hypothesis test ("ht") or a confidence interval("ci").
+#When performing a hypothesis test, we also need to supply the null value, which in this case is 0, since the null hypothesis sets the two population means equal to each other.
+#The alternative hypothesis can be "less", "greater", or "twosided".
+#Lastly, the method of inference can be "theoretical" or "simulation" based.
+```
+
+*hypothesis, order and confidential interval*
+```{r, highlight=TRUE, message=FALSE}
+inference(y = nc$weight, x = nc$habit, est = "mean", type = "ht", null = 0, alternative = "twosided", method = "theoretical", order = c("smoker", "nonsmoker"))
+
+inference(y = nc$weight, x = nc$habit, est = "mean", type = "ci", null = 0, alternative = "twosided", method = "theoretical")
+```
+##5. Boxplot
+```{r, highlight=TRUE, message=FALSE}
+load(url("http://assets.datacamp.com/course/dasi/gss.Rdata"))
+names(gss)
+head(gss)
+summary(gss$wordsum)
+summary(gss$class)
+boxplot(gss$wordsum, gss$class)#分别画图
+
+by(gss$wordsum, gss$class, summary)
+plot(gss$wordsum ~ gss$class)#画出boxplot的图
+```
+
+##6. ANOVA
+```{r, highlight=TRUE, message=FALSE}
+inference(y = gss$wordsum, x = gss$class, est = "mean", method = "theoretical", type = "ht", alternative = "greater")
+```
+

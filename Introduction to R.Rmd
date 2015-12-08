@@ -1,0 +1,167 @@
+---
+title: "practice for introduction to R"
+author: "Longguang Qin"
+output: html_document
+---
+
+#Datatypes:
+
+* **Vectors** - (one dimensional array): can hold numeric, character or logical values. The elements in one vector all have the same datatype.
+
+* **Matrices** - (two dimensional array): can hold numeric, character or logical values. The elements in one matrix all have the same datatype.
+
+* **Data frames** - (two-dimensional objects): can hold numeric, character or logical values. Within a column all elements have the same data type, but different columns can be of different data type.
+
+* **Lists**: super vectors, can gather a variety of objects that differ in length, characteristic, type of activity that has to do be done; these objects can be matrices, vectors, data frames, even other lists, etc; it is not even required that these objects are related to each other.
+
+*******
+
+##Matrix
+
+> `matrix(..., byrow = TRUE, nrow = ..., dimnames = list(...))`, `attributes()`, `colnames`&`rownames`, `cbind()`&`rbind()`, `rowSums()`&`colSums`, `names()`, `dimnames()`
+
+1. **建立matirix**
+
+```{r, highlight=TRUE, message=FALSE}
+matrix(1:9, nrow = 3)
+matrix(1:9, byrow = TRUE, nrow = 3)
+```
+
+2. 
+
+```{r, highlight=TRUE, message=FALSE}
+new_hope <- c(460.998, 314.4)
+empire_strikes <- c(290.475, 247.900)
+return_jedi <- c(309.306, 165.8)
+star_wars_matrix <- matrix(c(new_hope, empire_strikes, return_jedi), byrow = TRUE, nrow = 3)#matrix只提取数据，消除名称
+
+colnames(star_wars_matrix) <- c('US', 'non-US')
+rownames(star_wars_matrix) <- c('A New Hope', 'The Empire Strikes Back', 'Return of the Jedi')
+
+attributes(star_wars_matrix)
+worldwide_Total <- rowSums(star_wars_matrix)
+all_wars_matrix <- cbind(star_wars_matrix, worldwide_Total)
+Total <- colSums(all_wars_matrix)
+all_in_all <- rbind(all_wars_matrix, Total)
+all_in_all
+```
+
+3. 
+
+```{r, highlight=TRUE, message=FALSE}
+box_office_all <- c(461, 314.4, 290.5, 247.9, 309.3, 165.8)
+movie_names <- c("A New Hope","The Empire Strikes Back","Return of the Jedi")
+col_titles <- c("US","non-US")
+star_wars_matrix <- matrix(box_office_all, nrow = 3, byrow = TRUE, dimnames = list(movie_names, col_titles))
+dimnames(star_wars_matrix)
+
+non_us_all  <- mean(star_wars_matrix[, 'non-US'])
+non_us_some <- mean(star_wars_matrix[1:2, 'non-US'])
+ticket_prices_matrix <- matrix(c(5, 5, 6, 6, 7, 7), nrow = 3, byrow = TRUE, dimnames = list(movie_names, col_titles))
+visitors <- star_wars_matrix/ticket_prices_matrix #matrix的向量化运算
+visitors
+
+average_us_visitors <- mean(visitors[, 1])
+average_non_us_visitors <- mean(visitors[, 2])
+```
+
+
+##Factors for categorical variables
+
+> `factor(..., order = ..., levels = ...)`, `levels()`, `summary()`, 
+
+1.
+```{r, highlight=TRUE, message=FALSE}
+animals_vector <- c("Elephant", "Giraffe", "Donkey", "Horse") #非有序，无大小之分
+factor_animals_vector <- factor(animals_vector)
+factor_animals_vector
+
+temperature_vector <- c("High", "Low", "High","Low", "Medium") #有序，有大小之分
+factor_temperature_vector <- factor(temperature_vector, order = TRUE, levels = c("Low", "Medium", "High")) 
+factor_temperature_vector
+```
+
+2.
+```{r, highlight=TRUE, message=FALSE}
+survey_vector <- c("M", "F", "F", "M", "M")
+factor_survey_vector <- factor(survey_vector)#R will automatically assign them alphabetically
+levels(factor_survey_vector) <- c("Female", "Male") #向对应位置的level命名
+factor_survey_vector
+summary(survey_vector)
+summary(factor_survey_vector)
+
+speed_vector <- c('Fast', 'Slow', 'Slow', 'Fast', 'Ultra-fast')
+factor_speed_vector <- factor(c('Fast', 'Slow', 'Slow', 'Fast', 'Ultra-fast'), ordered = TRUE, levels = c('Slow', 'Fast', 'Ultra-fast'))
+summary(factor_speed_vector) 
+compare_them <- speed_vector[2] > speed_vector[5]#有order的categorical variables才能比较
+compare_them
+```
+
+
+##Data frame
+
+> `data()`, `str()`, `data.frame()`, `subset(..., subset = ..., select = ...)`, `order(..., decreasing = )`
+
+1.
+```{r, highlight=TRUE, message=FALSE}
+data(mtcars)
+head(mtcars)
+tail(mtcars)
+str(mtcars)
+```
+
+2.
+```{r, highlight=TRUE, message=FALSE}
+planets <- c("Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune")
+type <- c("Terrestrial planet", "Terrestrial planet", "Terrestrial planet", "Terrestrial planet", "Gas giant", "Gas giant", "Gas giant", "Gas giant")
+diameter <- c(0.382, 0.949, 1, 0.532, 11.209, 9.449, 4.007, 3.883)
+rotation <- c(58.64, -243.02, 1, 1.03, 0.41, 0.43, -0.72, 0.67)
+rings <- c(FALSE, FALSE, FALSE, FALSE, TRUE, TRUE, TRUE, TRUE)
+planets_df  <- data.frame(planets, type, diameter, rotation, rings) #跟matrix不同，保留名称
+str(planets_df)
+```
+
+```{r, highlight=TRUE, message=FALSE}
+closest_planets_df <- planets_df[1:3, ]
+furthest_planets_df <- planets_df[6:8, ]
+furthest_planets_diameter <- planets_df[3:8, 'diameter']
+planets_with_rings_df <- planets_df[planets_df$rings, ]#用logical来提取TRUE值匹配项
+small_planets_df <- subset(planets_df, subset = diameter < planets_df[3, 'diameter'])
+small_planets_df
+```
+
+```{r, highlight=TRUE, message=FALSE}
+order(planets_df$diameter)
+sb_dia <- order(planets_df$diameter, decreasing = TRUE)
+planet_dia_order <- planets_df[sb_dia,]
+planet_dia_order
+```
+
+
+##List
+
+> `list()`, `names()`, 
+
+```{r, highlight=TRUE, message=FALSE}
+my_vector <- 1:10 
+my_matrix <- matrix(1:9, ncol = 3)
+my_df <- mtcars[1:10,]
+my_list <- list(my_vector, my_matrix, my_df)
+names(my_list) <- c('vec', 'mat', 'df')
+print(my_list)
+```
+
+```{r, highlight=TRUE, message=FALSE}
+actors <- c("Jack Nicholson", "Shelley Duvall", "Danny Lloyd", "Scatman Crothers", "Barry Nelson" )
+reviews <- data.frame(scores = c(4.5, 4.0, 5.0), sources = c('IMDb1', 'IMDb2', 'IMDb3'), comments = c('Best Horror Film I Have Ever Seen', 'A truly brilliant and scary film from Stanley Kubrick', 'A masterpiece of psychological horror'))
+shining_list <- list(moviename = 'The Shining', actors = actors, reviews = reviews)
+shining_list[1]#返回母格式，i.e. list
+class(shining_list[1])
+shining_list[[1]]#返回原储存格式，i.e. vector
+class(shining_list[[1]])
+
+last_actor <- shining_list[[2]][length(shining_list$actors)]
+second_review <- shining_list$reviews[2, 'comments']
+shining_list_full <- c(shining_list, year = 1980)
+str(shining_list_full)
+```

@@ -1,0 +1,109 @@
+---
+title: "Foundations for inference(1)"
+output: html_document
+---
+## 1. check data
+```{r, highlight=TRUE, message=FALSE}
+load(url("http://assets.datacamp.com/course/dasi/ames.RData"))
+names(ames)
+head(ames)
+str(ames)
+area <- ames$Gr.Liv.Area
+price <- ames$SalePrice
+summary(area)
+hist(area)
+```
+
+## Distribution of sample mean 
+
+> for loop, rep(), NA, par(), rang(), hist(xlim =)
+
+```{r, highlight=TRUE, message=FALSE}
+sample_means50 <- rep(NA, 5000) #sample = 50
+for (i in 1:5000) {
+        samp <- sample(area, 50)
+        sample_means50[i] <- mean(samp)
+}
+hist(sample_means50, breaks = 13)
+
+sample_means10 <- rep(NA, 5000)#sample = 10
+sample_means100 <- rep(NA, 5000)#sample = 100
+for (i in 1:5000) {
+        samp <- sample(area, 10)
+        sample_means10[i] <- mean(samp)
+        samp <- sample(area, 100)
+        sample_means100[i] <- mean(samp)
+}
+
+par(mfrow = c(3, 1))#3 rows and 1 col in a single graph
+
+xlimits <- range(sample_means10)# Define the limits for the x-axis
+
+hist(sample_means10, xlim = xlimits, breaks = 20)
+hist(sample_means50, xlim = xlimits, breaks = 20)
+hist(sample_means100, xlim = xlimits, breaks = 20)
+```
+
+**The effect of sample size**
+
+```{r, highlight=TRUE, message=FALSE}
+sample_means50 <- rep(NA, 5000)
+sample_means150 <- rep(NA, 5000)
+for(i in 1:5000){
+        sa <- sample(price, size = 50)
+        sample_means50[i] <- mean(sa)
+        sa <- sample(price, size = 150)
+        sample_means150[i] <- mean(sa)
+}
+par(mfrow = c(2, 1))
+xlimits <- range(sample_means50)
+hist(sample_means50, xlim = xlimits, breaks = 20)
+hist(sample_means150, xlim = xlimits, breaks = 20)
+```
+
+## Confidential interval
+
+> plot_ci()
+
+**Caculation**
+```{r, highlight=TRUE, message=FALSE}
+population <- ames$Gr.Liv.Area
+samp <- sample(population, 60)
+sample_mean <- mean(samp)
+hist(samp)
+se <- sd(samp)/sqrt(60)
+lower <- sample_mean - qnorm(.975) * se
+upper <- sample_mean + 1.96 * se
+c(lower, upper)
+```
+
+**Two sided: 95% & 99%**
+```{r, highlight=TRUE, message=FALSE}
+par(mfrow = c(2, 1))
+samp_mean <- rep(NA, 50)
+samp_sd <- rep(NA, 50)
+n <- 60
+for(i in 1:50){
+        samp <- sample(population, n)
+        samp_mean[i] <- mean(samp)
+        samp_sd[i] <- sd(samp)
+}
+lower <- samp_mean-1.96*samp_sd/sqrt(n)
+upper <- samp_mean+1.96*samp_sd/sqrt(n)
+pop_mean <- mean(population)
+plot_ci(lower, upper, pop_mean)
+
+samp_mean <- rep(NA, 50)
+samp_sd <- rep(NA, 50)
+n <- 60
+for(i in 1:50){
+        samp <- sample(population, n)
+        samp_mean[i] <- mean(samp)
+        samp_sd[i] <- sd(samp)
+}
+lower <- samp_mean-2.58*samp_sd/sqrt(n)
+upper <- samp_mean+2.58*samp_sd/sqrt(n)
+pop_mean <- mean(population)
+plot_ci(lower, upper, pop_mean)
+```
+
